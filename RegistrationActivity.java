@@ -27,6 +27,8 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class RegistrationActivity extends AppCompatActivity  {
 
+
+
     GoogleSignInClient mGoogleSignInClient;
 
     private EditText mEmail;
@@ -74,17 +76,18 @@ public class RegistrationActivity extends AppCompatActivity  {
 //                .build();
 
 
-
-        signInButton=(SignInButton)findViewById(R.id.sign_in_button);
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 signIn();
             }
         });
 
 
     }
+
+   // startActivity(new Intent(getApplicationContext(),DashBoardFragment.class));
 
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -94,6 +97,7 @@ public class RegistrationActivity extends AppCompatActivity  {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         super.onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
@@ -118,10 +122,15 @@ public class RegistrationActivity extends AppCompatActivity  {
                 String personId = acct.getId();
                 Uri personPhoto = acct.getPhotoUrl();
 
-                Toast.makeText(this, "User email"+personEmail, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "User email : "+personEmail, Toast.LENGTH_SHORT).show();
             }
 
-            startActivity(new Intent(RegistrationActivity.this , MainActivity.class));
+
+              // startActivity(new Intent(RegistrationActivity.this, HomeActivity.class));
+             //startActivity(new Intent(getApplicationContext(),DashBoardFragment.class));
+            startActivity(new Intent(RegistrationActivity.this,MainActivity.class));
+
+
 
             // Signed in successfully, show authenticated UI.
 
@@ -132,7 +141,6 @@ public class RegistrationActivity extends AppCompatActivity  {
             Log.d("Message" , e.toString());
         }
     }
-
 
 //    @Override
 //    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
@@ -156,10 +164,10 @@ public class RegistrationActivity extends AppCompatActivity  {
 //            Toast.makeText(getApplicationContext(),"Sign in cancel",Toast.LENGTH_LONG).show();
 //        }
 //    }
-    private void gotoProfile(){
-        Intent intent=new Intent(RegistrationActivity.this,MainActivity.class);
-        startActivity(intent);
-    }
+//    private void gotoProfile(){
+//        Intent intent=new Intent(RegistrationActivity.this, HomeActivity.class);
+//        startActivity(intent);
+//    }
 
 
 

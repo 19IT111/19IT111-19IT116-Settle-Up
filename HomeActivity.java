@@ -1,8 +1,15 @@
 package com.example.settleup;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -14,8 +21,14 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.Locale;
+
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+
+
 
     private BottomNavigationView bottomNavigationView;
 
@@ -25,17 +38,32 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private IncomeFragment incomeFragment;
     private ExpenseFragment expenseFragment;
 
+    private FirebaseAuth mAuth;
 
-    @SuppressLint("NonConstantResourceId")
+    //@SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        loadLocale();
+        mAuth=FirebaseAuth.getInstance();
+        //showChangeLanguageDialog();
+
+//        Button changeLang=findViewById(R.id.changeMyLang);
+//        changeLang.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                //show AlertDialog to display list of language, one can be selected
+//
+//                showChangeLanguageDialog();
+//            }
+//        });
 
         getSupportActionBar().setTitle("settleup");
         bottomNavigationView=findViewById(R.id.bottomNavigationbar);
-
+        View frameLayout = findViewById(R.id.main_frame);
         DrawerLayout drawerLayout=findViewById(R.id.drawer_layout);
+
         ActionBarDrawerToggle toogle=new ActionBarDrawerToggle(this,drawerLayout,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
 
         drawerLayout.addDrawerListener(toogle);
@@ -77,6 +105,66 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    private void showChangeLanguageDialog() {
+
+        //array of languages to display in alert dialog
+
+        final String[] listItems={"ગુજરાતી","हिंदी","English"};
+
+        AlertDialog.Builder mBuilder=new AlertDialog.Builder(HomeActivity.this);
+        mBuilder.setTitle("Choose Language...");
+        mBuilder.setSingleChoiceItems(listItems, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(which == 0){
+                    //Gujarati
+                    setLocale("gu");
+                    recreate();
+                }
+                else if(which == 1){
+                    //Hindi
+                    setLocale("hi");
+                    recreate();
+                }
+                else if(which == 2){
+                    //English
+                    setLocale("en");
+                    recreate();
+                }
+
+                //dismiss alert dialog when language selected
+
+                dialog.dismiss();
+
+            }
+        });
+
+        AlertDialog mDialog=mBuilder.create();
+        //show alert dialog
+        mDialog.show();
+
+    }
+
+    private void setLocale(String lang) {
+        Locale locale=new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config=new Configuration();
+        config.locale=locale;
+        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+        //saved data to shared preferences
+        SharedPreferences.Editor editor=getSharedPreferences("Settle Up", MODE_PRIVATE).edit();
+        editor.putString("My_Lang", lang);
+        editor.apply();
+    }
+
+    //load language saved in shared preferences
+
+    public void loadLocale(){
+        SharedPreferences prefs=getSharedPreferences("Settle Up", Activity.MODE_PRIVATE);
+        String language=prefs.getString("My_Lang", "");
+        setLocale(language);
+    }
+
     private void setFragment(Fragment fragment) {
 
         FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
@@ -111,6 +199,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
             case R.id.expense:
                 fragment=new ExpenseFragment();
+                break;
+
+            case R.id.changeMyLang:
+                showChangeLanguageDialog();
+                break;
+
+            case R.id.logout:
+                mAuth.signOut();
+                startActivity(new Intent(getApplicationContext(),MainActivity.class));
                 break;
 
 
